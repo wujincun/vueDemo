@@ -1,27 +1,17 @@
 <template>
-    <div>
-        <header-component/>
-        <div>this is template body</div>
-        <other-component/>
+    <div class="header">
+        我是header
     </div>
 </template>
-<style>
-    body{
-        background-color:#ff0000;
-    }
+<style lang="stylus">
+
 </style>
-<script>
-    import HeaderComponent from './components/header.vue'
-    import OtherComponent from './components/other.vue'
+<script type="text/ecmascript-6">
     export default{
-        data(){
-            return{
-                msg:'hello vue'
-            }
-        },
-        components:{
-            'other-component':OtherComponent,
-            HeaderComponent,
+        data () {
+            return {
+                msg: 'hello vue'
+            };
         }
-    }
+    };
 </script>
