@@ -21,9 +21,11 @@
     import axios from 'axios';
     export default {
         name: 'app',
-        data() {
+        data () {
             return {
-                seller: {}
+                seller: {
+                    type: Object
+                }
             };
         },
         created() {
