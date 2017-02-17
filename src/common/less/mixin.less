@@ -1,4 +1,4 @@
-/*.border-1px(@color){
+.border-1px(@color){
   position: relative;
   &:after{
     display: block;
@@ -9,9 +9,9 @@
     border-top: 1px solid @color;
     content: ''
   }
-}*/
+}
 
-.border-1px(@color) {
+/*.border-1px(@color) {
   position: relative;
   &:after {
     position: absolute;
@@ -22,6 +22,11 @@
     height: 1px;
     border-bottom: 1px solid @color;
     -webkit-transform: scaleY(0.5);
+  }
+}*/
+.border-none{
+  &:after{
+    display: none;
   }
 }
 

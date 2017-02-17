@@ -29,8 +29,8 @@
             };
         },
         created() {
-            axios.get('static/data.json').then((res) => {
-                this.seller = res.data.seller;
+            axios.get('api/seller').then((res) => {
+                this.seller = res.data.data;
             }).catch(function (error) {
                 console.log(error);
             });

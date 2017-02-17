@@ -1,9 +1,9 @@
 <template>
-    <span class="icon" :class="iconClassMap[iconType]"></span>
+    <span class="iconMap" :class="iconClassMap[iconType]"></span>
 </template>
 <style lang="less" rel="stylesheet/less">
     @import 'mixin.less';
-    .icon {
+    .iconMap {
         display: inline-block;
         vertical-align: top;
         width: 12px;
