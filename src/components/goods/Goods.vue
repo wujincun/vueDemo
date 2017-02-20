@@ -29,12 +29,16 @@
                 <div class="price">
                   <span class="now">&yen;{{food.price}}</span><span class="old" v-show="food.oldPrice">&yen;{{food.oldPrice}}</span>
                 </div>
+                <div class="cartcontrol_wrapper">
+                  <cartcontrol :food="food"></cartcontrol>
+                </div>
               </div>
             </li>
           </ul>
         </li>
       </ul>
     </div>
+    <shopCart :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopCart>
   </div>
 
 </template>
@@ -137,6 +141,11 @@
               color: rgb(147, 153, 159);
             }
           }
+          .cartcontrol_wrapper {
+            position: absolute;
+            right: 0;
+            bottom: 12px;
+          }
         }
       }
     }
@@ -144,6 +153,8 @@
 </style>
 <script type="text/ecmascript-6">
   import iconMap from 'components/iconMap/iconMap';
+  import shopCart from 'components/shopCart/shopCart';
+  import cartcontrol from 'components/cartcontrol/cartcontrol';
   import axios from 'axios';
   import BScroll from 'better-scroll';
   export default{
@@ -160,7 +171,9 @@
       };
     },
     components: {
-      iconMap
+      iconMap,
+      shopCart,
+      cartcontrol
     },
     computed: {
       currentIndex(){
@@ -179,6 +192,7 @@
           click: true  // 防止阻止默认事件
         });
         this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
+          click: true,  // 防止阻止默认事件
           probeType: 3 // better-scroll中的属性，类似探针，这里为3就是记录滚动的位置
         });
         this.foodsScroll.on('scroll', (pos) => {
