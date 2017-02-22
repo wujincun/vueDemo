@@ -38,7 +38,7 @@
         </li>
       </ul>
     </div>
-    <shopCart :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopCart>
+    <shopCart :select-foods="selectFoods" :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopCart>
   </div>
 
 </template>
@@ -157,6 +157,9 @@
   import cartcontrol from 'components/cartcontrol/cartcontrol';
   import axios from 'axios';
   import BScroll from 'better-scroll';
+  import Vue from 'vue';
+
+  const eventHub = new Vue();
   export default{
     props: {
       seller: {
@@ -184,6 +187,17 @@
             return i;
           }
         }
+      },
+      selectFoods(){
+        let foods = [];
+        this.goods.forEach((good) => {
+          good.foods.forEach((food) => {
+            if (food.count) {
+              foods.push(food);
+            }
+          });
+        });
+        return foods;
       }
     },
     methods: {

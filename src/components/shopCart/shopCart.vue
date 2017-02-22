@@ -17,6 +17,13 @@
         </div>
       </div>
     </div>
+    <div class="ball-container">
+      <transition name="drop">
+        <div v-for="ball in balls" v-show="ball.show" class="ball">
+          <div class="inner"></div>
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 <style lang="less" rel="stylesheet/less">
@@ -122,19 +129,33 @@
         }
       }
     }
+    .ball-container {
+      .ball {
+        position: fixed;
+        left: 32px;
+        bottom: 22px;
+        z-index: 200;
+        .inner {
+          width: 16px;
+          height: 16px;
+          border-radius: 50%;
+          background: rgb(0, 160, 220);
+        }
+        &.drop-enter, &.drop-enter-active {
+          transition: all 0.4s cubic-bezier(0.49, -0.29, 0.75, 0.41);
+          .inner {
+            transition: all 0.4s linear;
+          }
+        }
+      }
+    }
   }
 </style>
 <script type="text/ecmascript-6">
   export default{
     props: {
       selectFoods: {
-        type: Array,
-        default(){
-          return [{
-            price: 15,
-            count: 1
-          }];
-        }
+        type: Array
       },
       deliveryPrice: {
         type: Number,
@@ -146,7 +167,28 @@
       }
     },
     data () {
-      return {};
+      return {
+        balls: [
+          {
+            show: false
+          },
+          {
+            show: false
+          },
+          {
+            show: false
+          },
+          {
+            show: false
+          },
+          {
+            show: false
+          }
+        ]
+      };
+    },
+    created() {
+      this.$root.eventHub.$on('cart.add', this.drop);
     },
     computed: {
       totalPrice(){
@@ -180,6 +222,20 @@
           return 'enough';
         }
       }
+    },
+    methods: {
+      drop(el) {
+        for (let i = 0, l = this.balls.length; i < l; i++) {
+          let ball = this.balls[i];
+          if (!ball.show) {
+            ball.show = true;
+            ball.el = el;
+            this.dropBalls.push(ball);
+            return;
+          }
+        }
+      }
     }
+
   };
 </script>
