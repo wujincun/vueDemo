@@ -75,15 +75,15 @@
           return;
         }
         this.food.count ? this.food.count++ : Vue.set(this.food, 'count', 1);
+        this.$store.addCartEl = event.target;
+        // vm.$root 当前组件树的根 Vue 实例。如果当前实例没有父实例，此实例将会是其自已。
+        this.$root.$emit('cart.add', event.target);
       },
       decreaseCart(event){
         if (!event._constructed) {
           return;
         }
         this.food.count && this.food.count--;
-        this.$store.addCartEl = event.target;
-        // vm.$root 当前组件树的根 Vue 实例。如果当前实例没有父实例，此实例将会是其自已。
-        this.$root.eventHub.$emit('cart.add', event.target);
       }
     }
   };
