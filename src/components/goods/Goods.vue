@@ -16,7 +16,7 @@
         <li v-for="item in goods" class="food-list food-list-hook">
           <h1 class="title">{{item.name}}</h1>
           <ul>
-            <li v-for="food in item.foods" class="food-item">
+            <li v-for="food in item.foods" class="food-item" @click="goDetail(food)">
               <div class="icon">
                 <img width="57" height="57" :src="food.icon"/>
               </div>
@@ -39,6 +39,7 @@
       </ul>
     </div>
     <shopCart :select-foods="selectFoods" :deliveryPrice="seller.deliveryPrice" :minPrice="seller.minPrice"></shopCart>
+    <foodDetail :food="selectedFood" v-if="selectedFood" ref="myFood"></foodDetail>
   </div>
 
 </template>
@@ -58,13 +59,13 @@
       background: #f3f5f7;
       .current, .menu-item {
         display: table;
-        width: 56px;
+        width: 100%;
         height: 54px;
         line-height: 14px;
         padding: 0 12px;
         .text {
           display: table-cell;
-          width: 56px;
+          width: 100%;
           vertical-align: middle;
           font-size: 12px;
           .border-1px(rgba(7, 17, 27, 0.2))
@@ -155,6 +156,7 @@
   import iconMap from 'components/iconMap/iconMap';
   import shopCart from 'components/shopCart/shopCart';
   import cartcontrol from 'components/cartcontrol/cartcontrol';
+  import foodDetail from 'components/foodDetail/foodDetail';
   import axios from 'axios';
   import BScroll from 'better-scroll';
   import Vue from 'vue';
@@ -170,13 +172,15 @@
       return {
         goods: [],
         listHeight: [],
-        scrollY: 0
+        scrollY: 0,
+        selectedFood: {}
       };
     },
     components: {
       iconMap,
       shopCart,
-      cartcontrol
+      cartcontrol,
+      foodDetail
     },
     computed: {
       currentIndex(){
@@ -234,6 +238,12 @@
         let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook');
         let el = foodList[index];
         this.foodsScroll.scrollToElement(el, 300);
+      },
+      goDetail(food){
+        this.selectedFood = food;
+        this.$nextTick(() => {
+          this.$refs.myFood.showToggle();
+        });
       }
     },
     created() {
