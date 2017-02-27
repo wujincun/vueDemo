@@ -40,24 +40,25 @@
             <div class="title">
               商品评价
             </div>
-            <ratingSelect :selectType="selectType" :onlyContent="onlyContent" :desc="desc" :ratings="food.ratings"></ratingSelect>
-            <!--<div class="evel-list">
-              <ul>
-                <li class="evel" v-for="evel in evelArr">
-                  <div class="userInfo">
-                    <div class="time">{{evel.rateTime | time}}</div>
-                    <div class="user">
-                      <span>{{evel.username}}</span>
-                      <span class="avatar"><img :src="evel.avatar" width="12" height="12"></span>
-                    </div>
+            <ratingSelect :selectType="selectType" :onlyContent="onlyContent" :desc="desc"
+                          :ratings="food.ratings"></ratingSelect>
+            <div class="rating-wrapper">
+              <ul v-show="food.ratings && food.ratings.length" >
+                <li v-for="(rating,index) in food.ratings" class="rating-item"  v-show="needShow(rating.rateType,rating.text)">
+                  <div class="user">
+                    <span class="userName">{{rating.username}}</span>
+                    <img :src="rating.avatar" alt="rating.avatar" class="avatar" width="12" height="12">
                   </div>
-                  <div class="content">
-                    <span class="icon" :class="evel.rateType?'icon-thumb_down':'icon-thumb_up'"></span>
-                    <span class="text">{{evel.text}}</span>
-                  </div>
+                  <div class="time">{{rating.rateTime}}</div>
+                  <p class="text">
+                    <span
+                      :class="{'icon-thumb_up':rating.rateType === 0,'icon-thumb_down':rating.rateType === 1}"></span>
+                    {{rating.text}}
+                  </p>
                 </li>
               </ul>
-            </div>-->
+              <div class="no-rating" v-show="!food.ratings || !food.ratings.length">暂无评论</div>
+            </div>
           </div>
         </div>
       </div>
@@ -65,6 +66,8 @@
   </transition>
 </template>
 <style lang="less" rel="stylesheet/less">
+  @import "../../common/less/mixin";
+
   .detailWrapper {
     position: fixed;
     left: 0;
@@ -207,6 +210,53 @@
           font-weight: 500;
           color: #07111b;
         }
+        .rating-wrapper {
+          padding: 0 18px;
+          .rating-item {
+            position: relative;
+            padding: 16px 0;
+            .border-1px(rgba(7, 17, .27, 0.1));
+            .user {
+              position: absolute;
+              right: 0;
+              top: 16px;
+              line-height: 12px;
+              font-size: 0;
+              .userName {
+                display: inline-block;
+                margin-right: 6px;
+                vertical-align: top;
+                font-size: 10px;
+                color: rgb(147, 153, 159);
+              }
+              .avatar {
+                border-radius: 50%;
+              }
+            }
+            .time {
+              margin-bottom: 6px;
+              line-height: 12px;
+              font-size: 10px;
+              color: rgb(147, 153, 159);
+            }
+            .text {
+              line-height: 16px;
+              font-size: 12px;
+              color: rgb(7, 17, 27);
+              .icon-thumb_up, .icon-thumb_down {
+                line-height: 16px;
+                margin-right: 4px;
+                font-size: 12px;
+              }
+              .icon-thumb_up {
+                color: rgb(0, 160, 220);
+              }
+              .icon-thumb_down {
+                color: rgb(147, 153, 159);
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -229,7 +279,7 @@
       return {
         showFoodDetail: false,
         selectType: ALL,
-        onlyContent: true,
+        onlyContent: false,
         desc: {
           all: '全部',
           positive: '推荐',
@@ -241,12 +291,16 @@
       cartcontrol,
       ratingSelect
     },
+    created() {
+      this.$root.$on('ratingType.select', this.chooseType);
+      this.$root.$on('content.toggle', this.toggleOnlyContent);
+    },
     methods: {
       showToggle(){
         this.showFoodDetail = !this.showFoodDetail;
         if (this.showFoodDetail) {
           this.selectType = ALL;
-          this.onlyContent = true;
+          this.onlyContent = false;
           this.$nextTick(() => {
             if (!this.detailWrapperScroll) {
               this._initScroll();
@@ -267,6 +321,28 @@
         }
         this.$set(this.food, 'count', 1);
         this.$root.$emit('cart.add', event.target);
+      },
+      chooseType(type){
+        this.selectType = type;
+        this.$nextTick(() => {
+          this.detailWrapperScroll.refresh();
+        });
+      },
+      toggleOnlyContent(showContent){
+        this.onlyContent = showContent;
+        this.$nextTick(() => {
+          this.detailWrapperScroll.refresh();
+        });
+      },
+      needShow(type, text){
+        if (this.onlyContent && !text) {
+          return false;
+        }
+        if (this.selectType === ALL) {
+          return true;
+        } else {
+          return type === this.selectType;
+        }
       }
     }
   };

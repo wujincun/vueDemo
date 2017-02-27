@@ -1,13 +1,17 @@
 <template>
   <div class="ratingSelect">
     <div class="rating-type">
-      <span class="block positive" :class="{'active':selectType === 2}">{{desc.all}}<span class="count">47</span></span>
-      <span class="block positive" :class="{'active':selectType === 0}">{{desc.positive}}<span
-        class="count">50</span></span>
-      <span class="block negative" :class="{'active':selectType === 1}">{{desc.negative}}<span
-        class="count">27</span></span>
+      <span @click="select(2,$event)" class="block positive" :class="{'active':type === 2}">{{desc.all}}
+        <span class="count">{{this.ratings.length}}</span>
+      </span>
+      <span @click="select(0,$event)" class="block positive" :class="{'active':type === 0}">{{desc.positive}}
+        <span class="count">{{this.positives.length}}</span>
+      </span>
+      <span @click="select(1,$event)" class="block negative" :class="{'active':type === 1}">{{desc.negative}}
+        <span class="count">{{this.negatives.length}}</span>
+      </span>
     </div>
-    <div class="switch">
+    <div @click="toggleContent($event)" class="switch" :class="{'on':showContent}">
       <span class="icon-check_circle"></span>
       <span class="text">只看有内容的评价</span>
     </div>
@@ -58,13 +62,18 @@
       border-bottom: 1px solid rgba(7, 17, 27, 0.1);
       color: rgb(147, 153, 159);
       font-size: 0;
-      .icon-check_circle{
+      .icon-check_circle {
         margin-right: 4px;
         font-size: 24px;
       }
-      .text{
+      .text {
         vertical-align: top;
         font-size: 12px;
+      }
+      &.on{
+        .icon-check_circle {
+          color: #00a0dc;
+        }
       }
     }
   }
@@ -101,7 +110,39 @@
       }
     },
     data () {
-      return {};
+      return {
+        type: this.selectType,
+        showContent: this.onlyContent
+      };
+    },
+    computed: {
+      positives(){
+        return this.ratings.filter((rating) => {
+          return rating.rateType === POSITIVE;
+        });
+      },
+      negatives(){
+        return this.ratings.filter((rating) => {
+          return rating.rateType === NEGTIVE;
+        });
+      }
+    },
+    methods: {
+      select(type, $event){
+        if (!$event._constructed) {
+          return;
+        }
+        this.type = type;
+        this.$root.$emit('ratingType.select', this.type);
+      },
+      toggleContent($event){
+        if (!$event._constructed) {
+          return;
+        }
+        this.showContent = !this.showContent;
+        this.$root.$emit('content.toggle', this.showContent);
+      }
     }
+
   };
 </script>
