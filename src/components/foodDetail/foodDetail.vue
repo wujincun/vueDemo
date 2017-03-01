@@ -43,13 +43,14 @@
             <ratingSelect :selectType="selectType" :onlyContent="onlyContent" :desc="desc"
                           :ratings="food.ratings"></ratingSelect>
             <div class="rating-wrapper">
-              <ul v-show="food.ratings && food.ratings.length" >
-                <li v-for="(rating,index) in food.ratings" class="rating-item"  v-show="needShow(rating.rateType,rating.text)">
+              <ul v-show="food.ratings && food.ratings.length">
+                <li v-for="(rating,index) in food.ratings" class="rating-item"
+                    v-show="needShow(rating.rateType,rating.text)">
                   <div class="user">
                     <span class="userName">{{rating.username}}</span>
                     <img :src="rating.avatar" alt="rating.avatar" class="avatar" width="12" height="12">
                   </div>
-                  <div class="time">{{rating.rateTime}}</div>
+                  <div class="time">{{rating.rateTime | formatDate}}</div>
                   <p class="text">
                     <span
                       :class="{'icon-thumb_up':rating.rateType === 0,'icon-thumb_down':rating.rateType === 1}"></span>
@@ -256,6 +257,11 @@
               }
             }
           }
+          .no-rating {
+            padding: 16px 0;
+            font-size: 12px;
+            color: rgb(147, 153, 159);
+          }
         }
       }
     }
@@ -265,6 +271,7 @@
   import cartcontrol from 'components/cartcontrol/cartcontrol';
   import ratingSelect from 'components/ratingSelect/ratingSelect';
   import BScroll from 'better-scroll';
+  import {formatDate} from 'common/js/date';
 
   const POSITIVE = 0;
   const NEGTIVE = 1;
@@ -286,6 +293,12 @@
           negative: '吐槽'
         }
       };
+    },
+    filters: {
+      formatDate(time){
+        let date = new Date(time);
+        return formatDate(date, 'yyyy-MM-dd hh:mm');
+      }
     },
     components: {
       cartcontrol,
