@@ -1,5 +1,5 @@
 <template>
-  <div class="ratings">
+  <div class="ratings" ref="ratings">
     <div class="ratings-content">
       <div class="overview">
         <div class="overview-left">
@@ -26,10 +26,36 @@
       </div>
       <div class="divider"></div>
       <ratingSelect :selectType="selectType" :onlyContent="onlyContent" :ratings="ratings"></ratingSelect>
+      <div class="rating-wrapper">
+        <ul>
+          <li v-for="(rating,index) in ratings" class="rating-item" v-show="needShow(rating.rateType,rating.text)">
+            <div class="avatar">
+              <img width="28" height="28" :src="rating.avatar" alt="">
+            </div>
+            <div class="content">
+              <h1 class="name">{{rating.username}}</h1>
+              <div class="star-wrapper">
+                <star :size="24" :score="rating.score"></star>
+                <span class="delivery" v-show="rating.deliveryTime">{{rating.deliveryTime}}分钟送到</span>
+              </div>
+              <p class="text">{{rating.text}}</p>
+              <div class="recommend" v-show="rating.recommend && rating.recommend.length">
+                <span class="icon-thumb_up"></span>
+                <span v-for="(item,index) in rating.recommend" class="item">{{item}}</span>
+              </div>
+              <div class="time">
+                {{rating.rateTime | formatDate}}
+              </div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
 <style lang="less" rel="stylesheet/less">
+  @import "../../common/less/mixin";
+
   .ratings {
     position: absolute;
     top: 184px;
@@ -114,6 +140,81 @@
         }
       }
     }
+    .rating-wrapper {
+      padding: 0 18px;
+      .rating-item {
+        display: flex;
+        padding: 18px 0;
+        .border-1px(rgba(7, 17, 27, 0.1));
+        .avatar {
+          flex: 0 0 28px;
+          width: 28px;
+          margin-right: 12px;
+          img {
+            border-radius: 50%;
+          }
+        }
+        .content {
+          position: relative;
+          flex: 1;
+          .name {
+            margin-bottom: 4px;
+            line-height: 12px;
+            font-size: 10px;
+            color: rgb(7, 17, 27);
+          }
+          .star-wrapper {
+            margin-bottom: 6px;
+            font-size: 0;
+            > div {
+              display: inline-block;
+              vertical-align: top;
+            }
+            .star {
+              margin-right: 6px;
+            }
+            .delivery {
+              line-height: 12px;
+              font-size: 10px;
+              color: rgb(147, 153, 159);
+            }
+          }
+          .text {
+            margin-bottom: 8px;
+            line-height: 18px;
+            font-size: 12px;
+            color: rgb(7, 17, 27);
+          }
+          .recommend {
+            line-height: 16px;
+            font-size: 0;
+            .icon-thumb_up, .item {
+              display: inline-block;
+              margin: 0 8px 4px 0;
+              font-size: 9px;
+            }
+            .icon-thumb_up {
+              color: rgb(0, 160, 220);
+            }
+            .item {
+              padding: 0 6px;
+              border: 1px solid rgba(7, 17, 27, 0.1);
+              border-radius: 1px;
+              color: rgb(147, 153, 159);
+              background-color: #fff;
+            }
+          }
+          .time{
+            position: absolute;
+            top: 0;
+            right: 0;
+            line-height: 12px;
+            font-size: 10px;
+            color: rgb(147, 153, 159);
+          }
+        }
+      }
+    }
   }
 </style>
 <script type="text/ecmascript-6">
@@ -121,6 +222,7 @@
   import ratingSelect from 'components/ratingSelect/ratingSelect';
   import axios from 'axios';
   import BScroll from 'better-scroll';
+  import {formatDate} from 'common/js/date';
 
   const POSITIVE = 0;
   const NEGTIVE = 1;
@@ -142,36 +244,51 @@
       star,
       ratingSelect
     },
- /*   _initScroll() {
-      this.menuScroll = new BScroll(this.$refs.menuWrapper, {
-        click: true  // 防止阻止默认事件
-      });
-      this.foodsScroll = new BScroll(this.$refs.foodsWrapper, {
-        click: true,  // 防止阻止默认事件
-        probeType: 3 // better-scroll中的属性，类似探针，这里为3就是记录滚动的位置
-      });
-      this.foodsScroll.on('scroll', (pos) => {
-        this.scrollY = Math.abs(Math.round(pos.y));
-      });
-    },
-    _calculateHeight() {
-      let foodList = this.$refs.foodsWrapper.getElementsByClassName('food-list-hook');
-      let height = 0;
-      this.listHeight.push(height);
-      for (let i = 0; i < foodList.length; i++) {
-        let item = foodList[i];
-        height += item.clientHeight;
-        this.listHeight.push(height);
+    methods: {
+      _initScroll() {
+        this.ratingScroll = new BScroll(this.$refs.ratings, {
+          click: true  // 防止阻止默认事件
+        });
+      },
+      chooseType(type){
+        this.selectType = type;
+        this.$nextTick(() => {
+          this.ratingScroll.refresh();
+        });
+      },
+      toggleOnlyContent(showContent){
+        this.onlyContent = showContent;
+        this.$nextTick(() => {
+          this.ratingScroll.refresh();
+        });
+      },
+      needShow(type, text){
+        if (this.onlyContent && !text) {
+          return false;
+        }
+        if (this.selectType === ALL) {
+          return true;
+        } else {
+          return type === this.selectType;
+        }
       }
-    }, */
+    },
+
     created(){
       axios.get('api/ratings').then((res) => {
         this.ratings = res.data.data;
- /*       this.$nextTick(() => {
+        this.$nextTick(() => {
           this._initScroll(); // 初始化scroll
-          this._calculateHeight(); // 初始化列表高度列表
-        }); */
+        });
       });
+      this.$root.$on('ratingType.select', this.chooseType);
+      this.$root.$on('content.toggle', this.toggleOnlyContent);
+    },
+    filters: {
+      formatDate(time){
+        let date = new Date(time);
+        return formatDate(date, 'yyyy-MM-dd hh:mm');
+      }
     }
   };
 </script>
