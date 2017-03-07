@@ -193,6 +193,7 @@
           });
         } else {
           alert('refresh');
+          // 未取到数据,所以不能滚动
           this.sellerScroll.refresh();
         }
       }
