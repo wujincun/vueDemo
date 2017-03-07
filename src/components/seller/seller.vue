@@ -133,6 +133,9 @@
           padding: 16px 12px;
           .border-1px(rgba(7, 17, 27, 0.1));
           font-size: 0;
+          &:last-child{
+            border: none;
+           }
           .iconMap {
             width: 16px;
             height: 16px;
@@ -169,16 +172,29 @@
     created() {
       this.iconClassMap = ['decrease', 'special', 'discount', 'invoice', 'guarantee'];
     },
-    ready(){
-      this.sellerScroll = new BScroll(this.$refs.seller, {
-        click: true
+    watch: {
+      'seller': function () {
+        alert('watch');
+        this._initScroll();
+      }
+    },
+    mounted: function () {
+      this.$nextTick(function () {
+        alert('mounted');
+        // 代码保证 this.$el 在 document 中
+        this._initScroll();
       });
     },
     methods: {
       _initScroll(){
-        this.sellerScroll = new BScroll(this.$refs.seller, {
-          click: true
-        });
+        if (!this.sellerScroll) {
+          this.sellerScroll = new BScroll(this.$refs.seller, {
+            click: true
+          });
+        } else {
+          alert('refresh');
+          this.sellerScroll.refresh();
+        }
       }
     }
   };
