@@ -9,7 +9,7 @@
         width: 12px;
         height: 12px;
         margin-right: 2px;
-        background-size: 12px 12px;
+        background-size: contain;
         background-repeat: no-repeat;
         &.decrease {
             .bg-image('decrease_4')
